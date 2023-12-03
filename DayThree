@@ -1,0 +1,134 @@
+package year2023;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+/*
+  Only horrible part 1. 
+*/
+public class DayThree {
+
+	static int sum = 0;
+	static int gear = 0;
+
+	public static void main(String[] args) throws FileNotFoundException {
+		FileReader fr = new FileReader("day3.txt");
+		Scanner scan = new Scanner(fr);
+
+		List<String> input = new ArrayList<String>();
+
+		while (scan.hasNextLine()) {
+			input.add(scan.nextLine());
+		}
+
+		boolean adjacent = false;
+
+		for (int i = 0; i < input.size(); i++) {
+			String nr = "";
+
+			for (int j = 0; j < input.get(i).length(); j++) {
+
+				// if it is a number
+				if (Character.isDigit(input.get(i).charAt(j))) {
+					nr += input.get(i).charAt(j);
+
+					if (j != 0 && j != input.get(i).length() - 1 && !adjacent) {
+						if ((input.get(i).charAt(j - 1) != '.' && !Character.isDigit(input.get(i).charAt(j - 1)))
+								|| (input.get(i).charAt(j + 1) != '.'
+										&& !Character.isDigit(input.get(i).charAt(j + 1)))) {
+							// System.out.println(nr + " horizontal " + j + " " + input.get(i).length());
+							adjacent = true;
+						}
+					}
+					if (j == 0 && !adjacent) {
+						if (input.get(i).charAt(j + 1) != '.' && !Character.isDigit(input.get(i).charAt(j + 1))) {
+							// System.out.println(nr + " horizontal " + j + " " + input.get(i).length());
+							adjacent = true;
+						}
+					}
+					if (j == input.get(i).length() - 1 && !adjacent) {
+						if (input.get(i).charAt(j - 1) != '.' && !Character.isDigit(input.get(i).charAt(j - 1))) {
+							// System.out.println(nr + " horizontal " + j + " " + input.get(i).length());
+							adjacent = true;
+						}
+					}
+
+					if (!adjacent) {
+						if (i != 0 && i != input.size() - 1) {
+							if ((input.get(i - 1).charAt(j) != '.' && !Character.isDigit(input.get(i - 1).charAt(j)))
+									|| (input.get(i + 1).charAt(j) != '.'
+											&& !Character.isDigit(input.get(i + 1).charAt(j)))) {
+								// System.out.println(nr + " vertical");
+								adjacent = true;
+							}
+						}
+						if ((i != 0 && i != input.size() - 1) && (j != 0 && j != input.get(i).length() - 1)) {
+							if ((input.get(i - 1).charAt(j - 1) != '.'
+									&& !Character.isDigit(input.get(i - 1).charAt(j - 1)))
+									|| (input.get(i - 1).charAt(j + 1) != '.'
+											&& !Character.isDigit(input.get(i - 1).charAt(j)))
+									|| (input.get(i + 1).charAt(j + 1) != '.'
+											&& !Character.isDigit(input.get(i + 1).charAt(j + 1)))
+									|| (input.get(i + 1).charAt(j - 1) != '.'
+											&& !Character.isDigit(input.get(i + 1).charAt(j - 1))) && !adjacent) {
+								// System.out.println(nr + " diagonal");
+								adjacent = true;
+							}
+						}
+						if (i == 0 && !adjacent && j != 0) {
+							if ((input.get(i + 1).charAt(j + 1) != '.'
+									&& !Character.isDigit(input.get(i + 1).charAt(j + 1)))
+									|| (input.get(i + 1).charAt(j - 1) != '.'
+											&& !Character.isDigit(input.get(i + 1).charAt(j - 1))) && !adjacent) {
+								// System.out.println(nr + " when i = 0");
+								adjacent = true;
+							}
+						}
+						if (i == input.size() - 1 && !adjacent && j != input.get(i).length() - 1) {
+							if ((input.get(i - 1).charAt(j - 1) != '.'
+									&& !Character.isDigit(input.get(i - 1).charAt(j - 1)))
+									|| (input.get(i - 1).charAt(j + 1) != '.'
+											&& !Character.isDigit(input.get(i - 1).charAt(j))) && !adjacent) {
+								adjacent = true;
+								// System.out.println(nr + " i = end");
+							}
+						}
+
+					}
+				} else {
+					if (adjacent) {
+						sumUp(nr);
+						adjacent = false;
+					}
+					nr = "";
+
+				}
+			}
+			if (adjacent && !nr.equals("")) {
+				sumUp(nr);
+				adjacent = false;
+				nr = "";
+			} 
+		}
+
+
+
+
+		System.out.println("Day three, part one: " + sum);
+		System.out.println("Day three, part two: " + gear);
+
+		scan.close();
+	}
+
+	public static void sumUp(String text) {
+		int parsing = Integer.parseInt(text);
+		sum += parsing;
+	}
+
+	public static void sumUp(int nr) {
+		gear += nr;
+	}
+}
