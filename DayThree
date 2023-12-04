@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /*
-  Only horrible part 1. 
+	only took me 1 day longer to get part 2 working. I hate it
 */
 public class DayThree {
 
@@ -31,7 +31,6 @@ public class DayThree {
 
 			for (int j = 0; j < input.get(i).length(); j++) {
 
-				// if it is a number
 				if (Character.isDigit(input.get(i).charAt(j))) {
 					nr += input.get(i).charAt(j);
 
@@ -39,19 +38,16 @@ public class DayThree {
 						if ((input.get(i).charAt(j - 1) != '.' && !Character.isDigit(input.get(i).charAt(j - 1)))
 								|| (input.get(i).charAt(j + 1) != '.'
 										&& !Character.isDigit(input.get(i).charAt(j + 1)))) {
-							// System.out.println(nr + " horizontal " + j + " " + input.get(i).length());
 							adjacent = true;
 						}
 					}
 					if (j == 0 && !adjacent) {
 						if (input.get(i).charAt(j + 1) != '.' && !Character.isDigit(input.get(i).charAt(j + 1))) {
-							// System.out.println(nr + " horizontal " + j + " " + input.get(i).length());
 							adjacent = true;
 						}
 					}
 					if (j == input.get(i).length() - 1 && !adjacent) {
 						if (input.get(i).charAt(j - 1) != '.' && !Character.isDigit(input.get(i).charAt(j - 1))) {
-							// System.out.println(nr + " horizontal " + j + " " + input.get(i).length());
 							adjacent = true;
 						}
 					}
@@ -61,7 +57,6 @@ public class DayThree {
 							if ((input.get(i - 1).charAt(j) != '.' && !Character.isDigit(input.get(i - 1).charAt(j)))
 									|| (input.get(i + 1).charAt(j) != '.'
 											&& !Character.isDigit(input.get(i + 1).charAt(j)))) {
-								// System.out.println(nr + " vertical");
 								adjacent = true;
 							}
 						}
@@ -74,7 +69,6 @@ public class DayThree {
 											&& !Character.isDigit(input.get(i + 1).charAt(j + 1)))
 									|| (input.get(i + 1).charAt(j - 1) != '.'
 											&& !Character.isDigit(input.get(i + 1).charAt(j - 1))) && !adjacent) {
-								// System.out.println(nr + " diagonal");
 								adjacent = true;
 							}
 						}
@@ -83,7 +77,6 @@ public class DayThree {
 									&& !Character.isDigit(input.get(i + 1).charAt(j + 1)))
 									|| (input.get(i + 1).charAt(j - 1) != '.'
 											&& !Character.isDigit(input.get(i + 1).charAt(j - 1))) && !adjacent) {
-								// System.out.println(nr + " when i = 0");
 								adjacent = true;
 							}
 						}
@@ -93,29 +86,220 @@ public class DayThree {
 									|| (input.get(i - 1).charAt(j + 1) != '.'
 											&& !Character.isDigit(input.get(i - 1).charAt(j))) && !adjacent) {
 								adjacent = true;
-								// System.out.println(nr + " i = end");
 							}
 						}
 
 					}
+
 				} else {
+					if (!adjacent) {
+						String t = input.get(i);
+						t = t.replace(nr, ".".repeat(nr.length()));
+						input.set(i, t);
+					}
 					if (adjacent) {
 						sumUp(nr);
 						adjacent = false;
 					}
 					nr = "";
-
 				}
 			}
 			if (adjacent && !nr.equals("")) {
 				sumUp(nr);
 				adjacent = false;
 				nr = "";
-			} 
+			}
 		}
 
+		for (int i = 0; i < input.size(); i++) {
+			List<Integer> numbers = new ArrayList<Integer>();
+			for (int j = 0; j < input.get(i).length(); j++) {
+				if (input.get(i).charAt(j) == '*') {
 
+					// left
+					if (j != 0) {
+						if (Character.isDigit(input.get(i).charAt(j - 1))) {
+							int o = j - 1;
+							String n = "";
+							while (o >= 1 && Character.isDigit(input.get(i).charAt(o - 1))) {
+								o--;
+							}
+							while (o < input.get(i).length() && Character.isDigit(input.get(i).charAt(o))) {
+								n += input.get(i).charAt(o);
+								o++;
+							}
+							if (!n.equals("")) {
+								numbers.add(Integer.parseInt(n));
+							}
+						}
+					}
+					// right
+					if (j + 1 < input.get(i).length()) {
+						if (Character.isDigit(input.get(i).charAt(j + 1))) {
+							int o = j + 1;
+							String n = "";
+							while (o >= 1 && Character.isDigit(input.get(i).charAt(o - 1))) {
+								o--;
+							}
+							while (o < input.get(i).length() && Character.isDigit(input.get(i).charAt(o))) {
+								n += input.get(i).charAt(o);
+								o++;
+							}
+							if (!n.equals("")) {
+								numbers.add(Integer.parseInt(n));
+							}
+						}
+					} else {
+						if (Character.isDigit(input.get(i).charAt(j))) {
+							int o = j;
+							String n = "";
+							while (o >= 1 && Character.isDigit(input.get(i).charAt(o - 1))) {
+								o--;
+							}
+							while (o < input.get(i).length() && Character.isDigit(input.get(i).charAt(o))) {
+								n += input.get(i).charAt(o);
+								o++;
+							}
+							if (!n.equals("")) {
+								numbers.add(Integer.parseInt(n));
+							}
+						}
+					}
 
+					boolean up = false;
+					boolean down = false;
+
+					if (i != 0) {
+						// up for in between rows
+						if (Character.isDigit(input.get(i - 1).charAt(j))) {
+							int o = j;
+							String n = "";
+							while (o >= 1 && Character.isDigit(input.get(i - 1).charAt(o - 1))) {
+								o--;
+							}
+
+							while (o < input.get(i).length() && Character.isDigit(input.get(i - 1).charAt(o))) {
+								n += input.get(i - 1).charAt(o);
+								o++;
+							}
+							if (!n.equals("")) {
+								up = true;
+								numbers.add(Integer.parseInt(n));
+							}
+						}
+						// left and up
+						if (Character.isDigit(input.get(i - 1).charAt(j - 1))) {
+							int o = j - 1;
+							String n = "";
+							while (o >= 1 && Character.isDigit(input.get(i - 1).charAt(o - 1))) {
+								o--;
+							}
+
+							while (o < input.get(i).length() && Character.isDigit(input.get(i - 1).charAt(o))) {
+								n += input.get(i - 1).charAt(o);
+								o++;
+							}
+							if (!n.equals("") && !up) {
+								numbers.add(Integer.parseInt(n));
+							}
+						}
+						// up and right
+						if (Character.isDigit(input.get(i - 1).charAt(j + 1))) {
+							int o = j + 1;
+							String n = "";
+							while (o >= 1 && Character.isDigit(input.get(i - 1).charAt(o - 1))) {
+								o--;
+							}
+
+							while (o < input.get(i - 1).length() && Character.isDigit(input.get(i - 1).charAt(o))) {
+								n += input.get(i - 1).charAt(o);
+								o++;
+
+							}
+							if (!n.equals("") && !up) {
+								numbers.add(Integer.parseInt(n));
+							}
+						}
+					}
+
+					if (i != input.size() - 1) {
+						// down for in between rows
+						if (Character.isDigit(input.get(i + 1).charAt(j))) {
+							int o = j;
+							String n = "";
+							while (o >= 1 && Character.isDigit(input.get(i + 1).charAt(o - 1))) {
+								o--;
+							}
+
+							while (o < input.get(i).length() && Character.isDigit(input.get(i + 1).charAt(o))) {
+								n += input.get(i + 1).charAt(o);
+								o++;
+							}
+							if (!n.equals("")) {
+								down = true;
+								numbers.add(Integer.parseInt(n));
+							}
+						}
+
+						// down right
+						if (Character.isDigit(input.get(i + 1).charAt(j + 1))) {
+							int o = j + 1;
+							String n = "";
+							while (o >= 1 && Character.isDigit(input.get(i + 1).charAt(o - 1))) {
+								o--;
+							}
+
+							while (o < input.get(i).length() && Character.isDigit(input.get(i + 1).charAt(o))) {
+								n += input.get(i + 1).charAt(o);
+								o++;
+							}
+							if (!n.equals("") && !down) {
+								numbers.add(Integer.parseInt(n));
+							}
+
+						}
+						// down left
+						if (Character.isDigit(input.get(i + 1).charAt(j - 1))) {
+							int o = j - 1;
+							String n = "";
+							while (o >= 1 && Character.isDigit(input.get(i + 1).charAt(o - 1))) {
+								o--;
+							}
+
+							while (o < input.get(i).length() && Character.isDigit(input.get(i + 1).charAt(o))) {
+								n += input.get(i + 1).charAt(o);
+								o++;
+							}
+							if (!n.equals("") && !down) {
+								numbers.add(Integer.parseInt(n));
+							}
+
+						}
+					}
+					down = false;
+					up = false;
+				}
+
+				if (numbers.size() == 2) {
+
+					sumUp(numbers.get(0) * numbers.get(1));
+					numbers.clear();
+
+				} else {
+					numbers.clear();
+				}
+			}
+
+			if (numbers.size() == 2) {
+
+				sumUp(numbers.get(0) * numbers.get(1));
+				numbers.clear();
+
+			} else {
+				numbers.clear();
+			}
+
+		}
 
 		System.out.println("Day three, part one: " + sum);
 		System.out.println("Day three, part two: " + gear);
