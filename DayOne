@@ -87,9 +87,6 @@ public class DayOne {
 
 		System.out.println("Day One, Part Two: " + sum);
 		scan1.close();
-		// 48770 48445 too low
-		// 55538 too high
-		// 55428 54868 54888 not right
 	}
 
 	public static void sumUp(String text) {
