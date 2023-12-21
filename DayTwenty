@@ -1,0 +1,119 @@
+package year2023;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+public class DayTwenty {
+
+	static long sum = 0;
+	static Map<String, Modules> input;
+	
+	// flip flop modules % on or off . starts off
+		// if fli pflop receives a high pilse it is ignores
+		// low pulse - flips between on and off, if off - turns on and sends high pulse 
+		// low pulse when on - sends low pulse and off
+	
+	// conjuction prfix &  -  remember type of the most revent pulse from each of their
+	//connected input - default : low pulse for each input 
+	// if pulse is received, first updates its memory for that input 
+	// then if it remember high pulse - sends a low pulse
+	//otherwise high pulse
+	
+	//croadcaster - sends pulse to all destination modules
+	
+	// button module - low pulse to braodcaster
+	public static void main(String[] args) throws IOException {
+
+		FileReader fr = new FileReader("day20.txt");
+		Scanner scan = new Scanner(fr);
+
+		List<String> in = new ArrayList<String>(); 
+		while(scan.hasNextLine()) {
+			in.add(scan.nextLine());
+		}
+		scan.close();
+		
+		input = new HashMap<String, Modules>();
+		for(int i = 0; i < in.size(); i++) {
+			String temp = in.get(i);
+			String key = ""; 
+			Modules root = null;
+			if(temp.startsWith("broadcaster")) {
+				key = "broadcaster";
+				root = new Modules(key, "");
+			} else {
+				key = temp.substring(1, temp.indexOf(" "));
+				root = new Modules(String.valueOf(temp.charAt(0)), key);			
+			}
+			temp = temp.substring(temp.indexOf(">") + 1);
+			String[] options = temp.split(",");
+			for (int j = 0; j < options.length; j++) {
+				String m = options[j].trim();
+				root.next = new Modules("", m);
+				root = root.next;
+			}
+			input.put(key, root);
+		}
+		
+		
+		System.out.println("Day Twenty, Part One: " + sum);
+		System.out.println("Day Twenty, Part Two: " + 0);
+
+	}
+	
+	static void multiply(long s, long s1) {
+		sum = sum + s * s1;
+	}
+	
+	static class Modules {
+		String type;
+		String data; 
+		Modules next; 
+		
+		Modules(String t, String d) {
+			this.type = t; 
+			this.data = d; 
+			this.next = null;
+		}
+		
+		void insert(Modules m) {
+			this.next = m; 
+		}
+		
+		public String toString() {
+			if(this.next != null)
+				return this.type + " " + this.data + " | " + this.next.toString();
+			else
+				return this.type + " " + this.data; 
+		}
+	}
+	
+	
+	/*
+	static class ModuleList {
+		Modules root; 
+		Modules next; 
+		
+		ModuleList() {
+			this.root = null; 
+			this.next = null;
+		}
+		
+		void insert(Modules m) {
+			
+		}
+		
+		*/
+		
+		
+		
+	//}
+	
+	
+}
