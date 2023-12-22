@@ -1,32 +1,34 @@
-package year2023;
+package days2023;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Scanner;
 
 public class DayTwenty {
 
 	static long sum = 0;
 	static Map<String, Modules> input;
-	
+	static Queue<Modules> queue;
+
 	// flip flop modules % on or off . starts off
-		// if fli pflop receives a high pilse it is ignores
-		// low pulse - flips between on and off, if off - turns on and sends high pulse 
-		// low pulse when on - sends low pulse and off
-	
+	// if fli pflop receives a high pilse it is ignores
+	// low pulse - flips between on and off, if off - turns on and sends high pulse 
+	// low pulse when on - sends low pulse and off
+
 	// conjuction prfix &  -  remember type of the most revent pulse from each of their
 	//connected input - default : low pulse for each input 
 	// if pulse is received, first updates its memory for that input 
 	// then if it remember high pulse - sends a low pulse
 	//otherwise high pulse
-	
+
 	//croadcaster - sends pulse to all destination modules
-	
+
 	// button module - low pulse to braodcaster
 	public static void main(String[] args) throws IOException {
 
@@ -38,7 +40,7 @@ public class DayTwenty {
 			in.add(scan.nextLine());
 		}
 		scan.close();
-		
+
 		input = new HashMap<String, Modules>();
 		for(int i = 0; i < in.size(); i++) {
 			String temp = in.get(i);
@@ -46,74 +48,135 @@ public class DayTwenty {
 			Modules root = null;
 			if(temp.startsWith("broadcaster")) {
 				key = "broadcaster";
-				root = new Modules(key, "");
+				root = new Modules(key, "", 0);
 			} else {
 				key = temp.substring(1, temp.indexOf(" "));
-				root = new Modules(String.valueOf(temp.charAt(0)), key);			
+				int state = 0;
+				if(temp.charAt(0) == '%') {
+					state = 0;
+				} else if (temp.charAt(0) == '&') {
+					state = 1;
+				}
+				root = new Modules(String.valueOf(temp.charAt(0)), key, state);			
 			}
 			temp = temp.substring(temp.indexOf(">") + 1);
 			String[] options = temp.split(",");
 			for (int j = 0; j < options.length; j++) {
 				String m = options[j].trim();
-				root.next = new Modules("", m);
+				root.next = new Modules("", m, -1);
 				root = root.next;
 			}
 			input.put(key, root);
 		}
-		
-		
+
+		pressButton(1);
+
 		System.out.println("Day Twenty, Part One: " + sum);
 		System.out.println("Day Twenty, Part Two: " + 0);
 
 	}
-	
+
+	static void pressButton(int amount) {
+		int lowPulse = 0;
+		int highPulse = 0; 
+		queue = new PriorityQueue<>();
+		Modules root = input.get("broadcaster");
+		queue.add(root);
+		//handle each pulse completely 
+		for(int i = 0; i < amount; i++) {
+			while(!queue.isEmpty()) {
+				Modules current = queue.poll();
+				while(current.next != null) {
+					queue.add(current.next);
+				}
+				PulseState cState = null; 
+				String key = current.data;
+				Modules currentT = input.get(key);
+				cState = currentT.processPulse(1);
+				
+				if(cState != null) {
+					key = cState.m;
+					Modules inside = input.get(key);
+					while(inside.next != null) {
+						queue.add(inside);
+					}
+				}
+
+
+			}
+		}
+		//add pulses in a queue, pop them off one by one 
+
+	}
+
 	static void multiply(long s, long s1) {
 		sum = sum + s * s1;
 	}
+
+	record PulseState(int pulse, String m) {};
 	
 	static class Modules {
 		String type;
 		String data; 
 		Modules next; 
-		
-		Modules(String t, String d) {
+		int state;
+		List<Integer> conMemory;
+
+		Modules(String t, String d, int st) {
 			this.type = t; 
 			this.data = d; 
+			this.state = st;
 			this.next = null;
+			if(this.type.equals("&"))
+				conMemory = new ArrayList<>();
 		}
-		
+
 		void insert(Modules m) {
 			this.next = m; 
 		}
-		
+
+		PulseState processPulse(int p) {
+			PulseState st = null;
+			//low pulse is 1 
+			if(p == 1) {
+				if(this.type.equals("%")) {
+					if (this.state == 0) {
+						this.state = 1;
+						st = this.sendPulse(2);
+					} else if(this.state == 1) {
+						this.state = 0; 
+						st = this.sendPulse(1);
+					}
+				}
+			}
+			if(this.type.equals("&")) {
+				this.state = p;
+				boolean high = true;
+				for (Integer integer : conMemory) {
+					if(integer != 2) {
+						high = false;
+						break;
+					}
+				}
+				if (high) {
+					st = this.sendPulse(1);
+				} else {
+					st = this.sendPulse(2);
+				}
+			}
+			return st; 
+		}
+
+		PulseState sendPulse(int p) {
+			return new PulseState(p, this.data);
+		}
+
 		public String toString() {
 			if(this.next != null)
 				return this.type + " " + this.data + " | " + this.next.toString();
 			else
 				return this.type + " " + this.data; 
 		}
-	}
-	
-	
-	/*
-	static class ModuleList {
-		Modules root; 
-		Modules next; 
-		
-		ModuleList() {
-			this.root = null; 
-			this.next = null;
-		}
-		
-		void insert(Modules m) {
-			
-		}
-		
-		*/
-		
-		
-		
-	//}
-	
-	
+	}	
+
 }
